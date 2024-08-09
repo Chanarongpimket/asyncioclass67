@@ -6,31 +6,25 @@ opponent_compute_time = 0.5
 opponents = 24
 move_pairs = 30
 
-async def game(x):
+async def main(x):
     board_start_time = time.perf_counter()
     for i in range(move_pairs):
-        # Simulate thinking time for Judit
-        await asyncio.sleep(my_compute_time)
+        time.sleep(my_compute_time)
         print(f"BOARD-{x+1} {i+1} Judit made a move.")
-        
-        # Simulate thinking time for the opponent
         await asyncio.sleep(opponent_compute_time)
-        print(f"BOARD-{x+1} {i+1} Opponent made a move.")
-    
-    elapsed_time = time.perf_counter() - board_start_time
-    print(f"BOARD-{x+1} - >>>>>>>>>>>>>>>>> Finished move in {round(time.perf_counter())} ")
-    return round(elapsed_time)
+        print(f"BOARD-{x+1} {i+1} opponent made a move.")
 
-async def main():
+    print(f"BOARD-{x+1} - >>>>>>>>>>>>>>>>> Finished move in {round(time.perf_counter() - board_start_time)} seconds.")
+    return round(time.perf_counter() - board_start_time)
+
+async def async_io():
+    task = []
+    for i in range(opponents):
+        task += [main(i)]
+    await asyncio.gather(*task)
+    print(f"Board exhibition finished in {round(time.perf_counter() - start_time)} seconds.")
+
+if __name__ == "__main__":
     start_time = time.perf_counter()
-    
-    # Run the games asynchronously
-    board_tasks = [game(board) for board in range(opponents)]
-    board_times = await asyncio.gather(*board_tasks)
-    
-    board_time = sum(board_times)
-    print(f"Board exhibition finished in {board_time} secs.")
-    print(f"Finished in {round(time.perf_counter() - start_time)} secs.")
-
-# Run the asynchronous main function
-asyncio.run(main())
+    asyncio.run(async_io())
+    print(f"Finished in {round(time.perf_counter() - start_time)} seconds.")
